@@ -12,19 +12,21 @@
     .viewer button{padding:6px 10px;border-radius:10px;border:1px solid #c9a87c;background:#fff}
     select,input,textarea,button{font:inherit;padding:10px 12px;border:1px solid #ddd;border-radius:10px}
     .thumb{max-width:100%;border:1px solid #eee;border-radius:10px;margin-top:6px}
-    #day-group { display: none !important; }
+    #day-group,
+    label[for="daySelect"],
+    #daySelect { display: none !important; }
   </style>
   <script src="/env.js"></script>
 </head>
 <body>
   <header>
     <h1>📖 給妳的 150 天</h1>
-    <p class="sub">選擇要寫的頁數（Day），句子會自動帶入；也可以翻頁瀏覽看看要寫哪一頁。</p>
+    <p class="sub">希望你能從這段日記找到自己，療癒自己，同時也想讓在畫畫的妳放鬆下來</p>
   </header>
 
   <main>
     <section class="card">
-      <h2>翻頁瀏覽（純看句子，不會送出）</h2>
+      <h2>翻頁，只要你有點壓力就點點吧，希望能從這些話中得到力量</h2>
       <div class="viewer">
         <button id="prev">上一頁</button>
         <div>Day <span id="viewDay">1</span></div>
@@ -37,9 +39,8 @@
       <h2>寫下今天</h2>
       <form id="entry-form">
         <div class="row">
-          <label>我要寫第幾頁（Day）</label>
+          <label for="daySelect">我要寫第幾頁（Day）</label>
           <select id="daySelect"></select>
-          <div class="muted" id="promptPreview">（會依 Day 自動帶入句子）</div>
         </div>
 
         <div class="row">
