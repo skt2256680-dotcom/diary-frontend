@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>給妳與畫的150天 · 雲端日記</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .row{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .muted{color:#777;font-size:13px}
+    .viewer{display:flex;align-items:center;gap:8px;margin:6px 0}
+    .viewer button{padding:6px 10px;border-radius:10px;border:1px solid #c9a87c;background:#fff}
+    select,input,textarea,button{font:inherit;padding:10px 12px;border:1px solid #ddd;border-radius:10px}
+    .thumb{max-width:100%;border:1px solid #eee;border-radius:10px;margin-top:6px}
+  </style>
+  <script src="/env.js"></script>
+</head>
+<body>
+  <header>
+    <h1>📖 給妳與畫的 150 天</h1>
+    <p class="sub">選擇要寫的頁數（Day），句子會自動帶入；也可以翻頁瀏覽看看要寫哪一頁。</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>翻頁瀏覽（純看句子，不會送出）</h2>
+      <div class="viewer">
+        <button id="prev">上一頁</button>
+        <div>Day <span id="viewDay">1</span></div>
+        <button id="next">下一頁</button>
+      </div>
+      <div id="viewText" class="muted"></div>
+    </section>
+
+    <section class="card">
+      <h2>寫下今天</h2>
+      <form id="entry-form">
+        <div class="row">
+          <label>我要寫第幾頁（Day）</label>
+          <select id="daySelect"></select>
+          <div class="muted" id="promptPreview">（會依 Day 自動帶入句子）</div>
+        </div>
+
+        <div class="row">
+          <label>日期（自訂文字，可留白）</label>
+          <input type="text" id="dateLabel" placeholder="例如：10/17 或 深夜" />
+        </div>
+
+        <div class="row">
+          <label>Day 標籤（自訂，可留白；如：Day 20 或 Day 20–25）</label>
+          <input type="text" id="dayLabel" placeholder="可留白" />
+        </div>
+
+        <div class="row"><label>作者</label><input type="text" id="author" required placeholder="你的名字或代號" /></div>
+        <div class="row"><label>標題</label><input type="text" id="title" placeholder="今天的一句話" /></div>
+        <div class="row"><label>心情</label>
+          <select id="mood"><option>🙂</option><option>😐</option><option>😢</option><option>😡</option><option>🥳</option><option>🥲</option></select>
+        </div>
+        <div class="row"><label>今天的事</label><textarea id="text" rows="6" placeholder="想寫幾句都行" required></textarea></div>
+        <div class="row"><label>照片</label><input type="file" id="image" accept="image/*" /></div>
+        <button type="submit">送出今天的日記</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>最近新增</h2>
+      <div id="recent"></div>
+    </section>
+
+    <section class="card">
+      <h2>最新影片</h2>
+      <div id="latest-video"></div>
+    </section>
+  </main>
+
+  <footer>Made with ♥ · 手機可安裝為 PWA</footer>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
