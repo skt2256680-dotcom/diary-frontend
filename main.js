@@ -1,5 +1,7 @@
 import { createClient } from './supabase.js';
 
+console.log('frontend build: v-upload-fix-1'); // ← 看 Console 就知道是不是新檔
+
 const params = new URLSearchParams(location.search);
 const diary = params.get('diary') || 'default-diary';
 
@@ -10,7 +12,7 @@ const supabase = createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_
 const IMAGE_BUCKET = window.ENV.IMAGE_BUCKET || 'diary-images';
 const VIDEO_BUCKET = window.ENV.VIDEO_BUCKET || 'diary-videos';
 
-// UI refs（有就用，沒有也不會壞）
+// UI
 const recent = document.getElementById('recent');
 const latestVideo = document.getElementById('latest-video');
 const viewDay = document.getElementById('viewDay');
@@ -38,13 +40,12 @@ async function getNextDay(diaryId) {
     .select('day_number')
     .eq('diary_id', diaryId)
     .not('day_number', 'is', null);
-
   if (error) {
     console.warn('getNextDay error', error);
     return 1;
   }
   const max = (data || []).reduce((m, r) => Math.max(m, r.day_number || 0), 0);
-  return Math.min(151, max + 1); // 最多到 151
+  return Math.min(151, max + 1);
 }
 
 // ---- Viewer（僅顯示；送出不靠它）----
@@ -92,12 +93,11 @@ async function loadRecent() {
 
 // ---- 最新影片 ----
 async function loadLatestVideo() {
+  if (!latestVideo) return;
   const list = await supabase.storage.from(VIDEO_BUCKET).list(diary, {
     limit: 100, sortBy: { column: 'name', order: 'desc' }
   });
-  if (!latestVideo) return;
   if (!list.data?.length) { latestVideo.innerHTML = '<em>尚無影片</em>'; return; }
-
   const latest = list.data[0];
   const signed = await supabase.storage.from(VIDEO_BUCKET)
     .createSignedUrl(`${diary}/${latest.name}`, 86400);
@@ -105,19 +105,28 @@ async function loadLatestVideo() {
   if (url) latestVideo.innerHTML = `<video controls src="${url}"></video>`;
 }
 
-// ---- 表單送出（自動帶 Day + 固定標題 + 簽名可留白）----
+// ---- 表單送出（自動 Day + 固定標題 + 簽名可留白）----
 if (form) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // 1) 圖片（可選）
+    // 1) 圖片（可選）— 這裡是重點：帶 contentType + upsert
     let image_url = null;
     const img = document.getElementById('image');
     if (img?.files?.length) {
       const file = img.files[0];
       const path = `${diary}/${Date.now()}-${file.name}`;
-      const up = await supabase.storage.from(IMAGE_BUCKET).upload(path, file);
-      if (up.error) { alert('圖片上傳失敗：' + up.error.message); return; }
+
+      const up = await supabase.storage
+        .from(IMAGE_BUCKET)
+        .upload(path, file, { contentType: file.type || 'image/png', upsert: true });
+
+      if (up.error) {
+        alert('圖片上傳失敗：' + up.error.message);
+        console.error(up.error);
+        return;
+      }
+
       const pub = await supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
       image_url = pub.data?.publicUrl || null;
     }
@@ -164,3 +173,4 @@ wireViewerNav();
 updateViewer();
 await loadRecent();
 await loadLatestVideo();
+
