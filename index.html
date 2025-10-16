@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>給妳與畫的150天 · 雲端日記</title>
+  <title>給妳的150天 · 雲端日記</title>
   <link rel="stylesheet" href="/styles.css">
   <style>
     .row{display:flex;flex-direction:column;gap:6px;margin:10px 0}
@@ -12,12 +12,13 @@
     .viewer button{padding:6px 10px;border-radius:10px;border:1px solid #c9a87c;background:#fff}
     select,input,textarea,button{font:inherit;padding:10px 12px;border:1px solid #ddd;border-radius:10px}
     .thumb{max-width:100%;border:1px solid #eee;border-radius:10px;margin-top:6px}
+    #day-group { display: none !important; }
   </style>
   <script src="/env.js"></script>
 </head>
 <body>
   <header>
-    <h1>📖 給妳與畫的 150 天</h1>
+    <h1>📖 給妳的 150 天</h1>
     <p class="sub">選擇要寫的頁數（Day），句子會自動帶入；也可以翻頁瀏覽看看要寫哪一頁。</p>
   </header>
 
@@ -51,7 +52,7 @@
           <input type="text" id="dayLabel" placeholder="可留白" />
         </div>
 
-        <div class="row"><label>作者</label><input type="text" id="author" required placeholder="你的名字或代號" /></div>
+        <div class="row"><label>簽名（可留白）</label><input type="text" id="author" required placeholder="你的名字或代號" /></div>
         <div class="row"><label>標題</label><input type="text" id="title" placeholder="今天的一句話" /></div>
         <div class="row"><label>心情</label>
           <select id="mood"><option>🙂</option><option>😐</option><option>😢</option><option>😡</option><option>🥳</option><option>🥲</option></select>
