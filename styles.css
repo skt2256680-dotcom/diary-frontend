@@ -1,1 +1,10 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,PingFangTC,'Microsoft JhengHei',sans-serif;background:#f6f1e7;color:#2a2a2a;margin:0}header{padding:24px 16px;border-bottom:4px double #c9a87c}main{max-width:820px;margin:0 auto;padding:16px}.card{background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;margin:16px 0}#recent .item{padding:8px 0;border-bottom:1px dashed #eee}video{width:100%;border-radius:12px}
+:root{
+  --prompt-font-size: 20px;
+  --entry-title-size: 22px;
+  --entry-text-size: 18px;
+}
+
+#promptPreview, #viewText{ font-size: var(--prompt-font-size); line-height: 1.6; }
+.item strong{ font-size: var(--entry-title-size); }
+.item .body, textarea#text{ font-size: var(--entry-text-size); line-height: 1.7; }
