@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>給妳的150天 · 雲端日記</title>
 
-  <!-- 全站樣式 -->
   <link rel="stylesheet" href="/styles.css" />
-
-  <!-- 頁面用到的少量補充樣式（保持簡單） -->
   <style>
     .row{display:flex;flex-direction:column;gap:6px;margin:10px 0}
     .muted{color:#777;font-size:13px}
@@ -16,15 +13,14 @@
     .viewer button{padding:6px 10px;border-radius:10px;border:1px solid #c9a87c;background:#fff}
     select,input,textarea,button{font:inherit;padding:10px 12px;border:1px solid #ddd;border-radius:10px}
     .thumb{max-width:100%;border:1px solid #eee;border-radius:10px;margin-top:6px}
-
-    /* 隱藏 Day 下拉（保留 DOM 供程式用） */
-    #day-group, label[for="daySelect"], #daySelect { display: none !important; }
-
-    /* 讓導引句文字大一點（也可移到 styles.css 用變數控制） */
+    #day-group, label[for="daySelect"], #daySelect { display:none !important; }
     #viewText { font-size: 20px; line-height: 1.7; }
+    .item .body{ white-space: pre-wrap; line-height: 1.7; }
+    button.ghost{ background:#fff; border:1px solid #ddd; border-radius:10px; padding:6px 10px; }
+    button.ghost.danger{ border-color:#e66; color:#d33; }
+    button.ghost.danger:active{ transform:translateY(1px); opacity:.9; }
   </style>
 
-  <!-- 前端環境變數（Supabase 等） -->
   <script src="/env.js"></script>
 </head>
 <body>
@@ -34,33 +30,23 @@
   </header>
 
   <main>
-    <!-- 導引句翻頁區 -->
     <section class="card">
       <h2>翻頁，只要你有點壓力就點點吧，希望能從這些話中得到力量</h2>
-
       <div class="viewer">
         <button id="prev">上一頁</button>
-
-        <!-- Day 顯示（顯示 Day + 數字） -->
         <div class="day">Day <span id="viewDay">1</span></div>
-
         <button id="next">下一頁</button>
-
-        <!-- 跳到指定 Day（1..151） -->
         <div style="display:flex;align-items:center;gap:8px;">
           <label for="jumpDay" class="muted">跳到 Day：</label>
           <input id="jumpDay" type="number" min="1" max="151" value="1" style="width:110px" />
         </div>
       </div>
-
       <div id="viewText" class="muted"></div>
     </section>
 
-    <!-- 填寫區 -->
     <section class="card">
       <h2>寫下今天</h2>
       <form id="entry-form">
-        <!-- 被程式使用的 Day 下拉（隱藏） -->
         <div class="row" id="day-group">
           <label for="daySelect">我要寫第幾頁（Day）</label>
           <select id="daySelect"></select>
@@ -68,10 +54,7 @@
 
         <div class="row">
           <label for="dateLabel">日期（自訂文字，可留白）</label>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <input type="text" id="dateLabel" placeholder="例如：10/17 或 深夜" />
-            <button type="button" id="clearDateLabel" class="ghost">清空</button>
-          </div>
+          <input type="text" id="dateLabel" placeholder="例如：10/17 或 深夜" />
         </div>
 
         <div class="row">
@@ -111,13 +94,11 @@
       </form>
     </section>
 
-    <!-- 最近新增（這裡會由 JS 注入每則卡片；會加刪除按鈕） -->
     <section class="card">
       <h2>最近新增</h2>
       <div id="recent"></div>
     </section>
 
-    <!-- 最新影片 -->
     <section class="card">
       <h2>最新影片</h2>
       <div id="latest-video"></div>
@@ -126,7 +107,6 @@
 
   <footer>Made with ♥ · 手機可安裝為 PWA</footer>
 
-  <!-- 只保留一份 script，避免重複載入 -->
-  <script type="module" src="/main.js?v=upload-fix-2"></script>
+  <script type="module" src="/main.js?v=delete-1"></script>
 </body>
 </html>
