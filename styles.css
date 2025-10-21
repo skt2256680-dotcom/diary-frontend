@@ -2,7 +2,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,PingFangTC,'
 :root{
   --prompt-font-size: 20px;
   --entry-title-size: 22px;
-  --entry-text-size: 13px;
+  --entry-text-size: 18px;
 }
 /* 讓導引句看起來更溫馨 */
 #viewText{
@@ -10,7 +10,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,PingFangTC,'
   background:#fff7ef;      /* 淺奶油底 */
   border:1px solid #f2dcc7;
   padding:10px 14px;
-  border-radius:12px;
+  border-radius:10px;
   font-size:13px;
   line-height:1.7;
 }
