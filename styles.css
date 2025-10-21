@@ -12,7 +12,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,PingFangTC,'
   border: 1px solid #f2dcc7;
   padding: 6px 10px;       /* 收小內距 */
   border-radius: 10px;
-  font-size: 15px;         /* 原本太大可改小一點 */
+  font-size: 10px;         /* 原本太大可改小一點 */
   line-height: 1.5;
   max-width: 100%;         /* 避免溢出手機螢幕 */
   box-sizing: border-box;
