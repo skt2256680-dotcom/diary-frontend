@@ -221,7 +221,7 @@ function wireForm(){
       diary_id: diary,
       date: new Date().toISOString().slice(0,10),
       author: (document.getElementById('author')?.value?.trim() || null),
-      title: '給妳的150天',
+      title: '倒數131天日記',
       text: document.getElementById('text')?.value || '',
       mood: document.getElementById('mood')?.value || null,
       image_url,
