@@ -4,6 +4,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,PingFangTC,'
   --entry-title-size: 22px;
   --entry-text-size: 18px;
 }
+/* 讓導引句看起來更溫馨 */
+#viewText{
+  color:#9a6b3c;           /* 溫暖棕橘 */
+  background:#fff7ef;      /* 淺奶油底 */
+  border:1px solid #f2dcc7;
+  padding:10px 14px;
+  border-radius:12px;
+  font-size:18px;
+  line-height:1.7;
+}
+
 
 #promptPreview, #viewText{ font-size: var(--prompt-font-size); line-height: 1.6; }
 .item strong{ font-size: var(--entry-title-size); }
