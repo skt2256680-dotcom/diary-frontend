@@ -14,9 +14,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,PingFangTC,'
   border-radius: 10px;
   font-size: 15px;         /* 原本太大可改小一點 */
   line-height: 1.5;
-  white-space: nowrap;     /* 不換行 */
-  overflow: hidden;
-  text-overflow: ellipsis; /* 若太長，自動用 … 省略 */
   max-width: 100%;         /* 避免溢出手機螢幕 */
   box-sizing: border-box;
 }
