@@ -1,6 +1,8 @@
 import { createClient } from './supabase.js';
 
-console.log('frontend build: v-delete-2b (no-top-level-await)');
+const MAX_DAY = 131; // ← 這裡決定最多幾天
+
+console.log('frontend build: v-delete-2c (MAX_DAY=131)');
 
 const params = new URLSearchParams(location.search);
 const diary = params.get('diary') || 'default-diary';
@@ -19,7 +21,7 @@ const viewDay       = document.getElementById('viewDay');
 const viewText      = document.getElementById('viewText');
 const prevBtn       = document.getElementById('prev');
 const nextBtn       = document.getElementById('next');
-const jumpDayInput  = document.getElementById('jumpDay');   // 有就用，沒也不會壞
+const jumpDayInput  = document.getElementById('jumpDay');
 const form          = document.getElementById('entry-form');
 
 // ───────────────── Prompts ─────────────────
@@ -48,24 +50,29 @@ async function getNextDay(diaryId) {
     .not('day_number', 'is', null);
   if (error) { console.warn('getNextDay error', error); return 1; }
   const max = (data || []).reduce((m, r) => Math.max(m, r.day_number || 0), 0);
-  return Math.min(151, max + 1);
+  return Math.min(MAX_DAY, max + 1);
 }
 
 // ───────────────── Viewer ─────────────────
 let autoDay = 1;
-const clampDay = n => Math.max(1, Math.min(151, Math.trunc(Number(n) || 1)));
+const clampDay = n => Math.max(1, Math.min(MAX_DAY, Math.trunc(Number(n) || 1)));
 
 function updateViewer(){
   if (!viewDay || !viewText) return;
   viewDay.textContent = String(autoDay);
   if (jumpDayInput) jumpDayInput.value = String(autoDay);
-  const t = (autoDay >= 1 && autoDay <= 151) ? promptTextById(autoDay) : null;
+
+  const t = (autoDay >= 1 && autoDay <= MAX_DAY) ? promptTextById(autoDay) : null;
   viewText.textContent = t ? `「${t}」` : '（不顯示句子）';
+
+  // UX：到邊界就禁用按鈕
+  if (prevBtn) prevBtn.disabled = (autoDay <= 1);
+  if (nextBtn) nextBtn.disabled = (autoDay >= MAX_DAY);
 }
 
 function wireViewerNav(){
   if (prevBtn) prevBtn.onclick = ()=>{ if (autoDay>1){ autoDay--; updateViewer(); } };
-  if (nextBtn) nextBtn.onclick = ()=>{ if (autoDay<151){ autoDay++; updateViewer(); } };
+  if (nextBtn) nextBtn.onclick = ()=>{ if (autoDay<MAX_DAY){ autoDay++; updateViewer(); } };
   if (jumpDayInput){
     const go=()=>{ autoDay = clampDay(jumpDayInput.value); updateViewer(); };
     jumpDayInput.addEventListener('change', go);
@@ -84,7 +91,7 @@ function extractPathFromPublicUrl(url){
   return path;
 }
 
-// ──────────────── 刪除（先刪檔案再刪資料） ────────────────
+// ──────────────── 刪除（先檔案、再資料） ────────────────
 async function deleteEntryAndAssets(id, image_path, image_url){
   // 1) 刪 Storage 檔（舊資料沒 path 時，從 URL 解析）
   const path = image_path || extractPathFromPublicUrl(image_url || '');
@@ -176,6 +183,13 @@ function wireForm(){
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
 
+    // 沒有 Day 可寫了就擋住
+    const inRange = autoDay >= 1 && autoDay <= MAX_DAY;
+    if (!inRange) {
+      alert(`已經是最後一頁了（Day ${MAX_DAY}）`);
+      return;
+    }
+
     let image_url = null;
     let image_path = null;
 
@@ -196,12 +210,11 @@ function wireForm(){
       }
       const pub = await supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
       image_url  = pub.data?.publicUrl || null;
-      image_path = path; // ← 存路徑，之後刪除會用到
+      image_path = path; // 存路徑，之後刪除會用到
     }
 
-    // 2) 自動 Day & 導引句
-    const inRange = autoDay>=1 && autoDay<=151;
-    const prompt_text = inRange ? promptTextById(autoDay) : null;
+    // 2) 導引句
+    const prompt_text = promptTextById(autoDay);
 
     // 3) payload
     const payload = {
@@ -213,8 +226,8 @@ function wireForm(){
       mood: document.getElementById('mood')?.value || null,
       image_url,
       image_path,
-      day_number: inRange ? autoDay : null,
-      prompt_id: inRange ? autoDay : null,
+      day_number: autoDay,
+      prompt_id: autoDay,
       prompt_text,
       date_label: document.getElementById('dateLabel')?.value || null,
       day_label: document.getElementById('dayLabel')?.value || null
@@ -224,14 +237,14 @@ function wireForm(){
     if (error){ alert('送出失敗：' + error.message); return; }
 
     // 4) 下一篇 + 清表單 + 重新載入
-    autoDay = Math.min(151, autoDay+1);
+    autoDay = Math.min(MAX_DAY, autoDay + 1);
     updateViewer();
 
     const textEl  = document.getElementById('text');
     const imageEl = document.getElementById('image');
     if (textEl)  textEl.value = '';
     if (imageEl) imageEl.value = '';
-    alert(`已儲存！本篇 ${payload.day_number ? `Day ${payload.day_number}` : '—'}${payload.prompt_text ? '（已帶句子）' : '（無導引句）'}`);
+    alert(`已儲存！本篇 Day ${payload.day_number}${payload.prompt_text ? '（已帶句子）' : '（無導引句）'}`);
 
     loadRecent();
   });
@@ -250,4 +263,4 @@ async function init(){
   await loadLatestVideo();
 }
 
-init();  // ← 啟動
+init();
