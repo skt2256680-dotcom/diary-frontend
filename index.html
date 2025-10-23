@@ -103,7 +103,55 @@
         <label style="margin-left:8px">跳到：</label>
         <input id="eJump" type="number" inputmode="numeric" min="1" style="width:90px" />
       </div>
-    
+      <style>
+      .soft-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 10px;
+      }
+      .soft-card {
+        background:#fffaf6;
+        border:1px solid #f1e2d6;
+        border-radius:16px;
+        padding:18px;
+        box-shadow:0 6px 18px rgba(195,106,45,0.08);
+      }
+      .soft-quote {
+        color:#c36a2d;
+        font-size:17px;
+        font-weight:600;
+        margin-bottom:8px;
+      }
+      .soft-meta {
+        color:#6b5f57;
+        font-size:13px;
+        margin-bottom:10px;
+        opacity:0.9;
+      }
+      .soft-text {
+        color:#3c3733;
+        line-height:1.7;
+        margin-bottom:12px;
+        white-space:pre-line;
+      }
+      .soft-img {
+        width:100%;
+        border-radius:12px;
+        border:1px solid #f0e4db;
+        margin-top:6px;
+      }
+      .soft-delete {
+        border:1px solid #e6a1a1;
+        background:#fff5f5;
+        color:#b00;
+        font-size:13px;
+        border-radius:8px;
+        padding:4px 8px;
+        cursor:pointer;
+        margin-top:6px;
+      }
+      </style>
       <div id="entryView" class="entry-card">
         <!-- 這裡由 JS 渲染單篇內容 -->
       </div>
