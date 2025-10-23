@@ -95,9 +95,20 @@
     </section>
 
     <section class="card">
-      <h2>最近新增</h2>
-      <div id="recent"></div>
+      <h2>日記瀏覽</h2>
+      <div class="viewer">
+        <button id="ePrev">上一頁</button>
+        <div>第 <span id="eCursor">1</span> / <span id="eTotal">0</span> 篇</div>
+        <button id="eNext">下一頁</button>
+        <label style="margin-left:8px">跳到：</label>
+        <input id="eJump" type="number" inputmode="numeric" min="1" style="width:90px" />
+      </div>
+    
+      <div id="entryView" class="entry-card">
+        <!-- 這裡由 JS 渲染單篇內容 -->
+      </div>
     </section>
+
 
     <section class="card">
       <h2>總結影片</h2>
