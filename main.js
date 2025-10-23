@@ -24,6 +24,14 @@ const nextBtn       = document.getElementById('next');
 const jumpDayInput  = document.getElementById('jumpDay');
 const form          = document.getElementById('entry-form');
 
+// 新增：日記瀏覽用
+const ePrev   = document.getElementById('ePrev');
+const eNext   = document.getElementById('eNext');
+const eCursor = document.getElementById('eCursor');
+const eTotal  = document.getElementById('eTotal');
+const eJump   = document.getElementById('eJump');
+const entryView = document.getElementById('entryView');
+
 // ───────────────── Prompts ─────────────────
 let PROMPTS = [];
 async function loadPrompts() {
@@ -108,50 +116,86 @@ async function deleteEntryAndAssets(id, image_path, image_url){
 }
 
 // ──────────────── 最近新增（含刪除） ────────────────
-async function loadRecent(){
+// ── 單篇瀏覽（一次顯示一天）────────────────────────
+let ENTRIES = [];     // 依 day_number 由小到大
+let idx = 0;          // 目前指到的索引（0-based）
+
+function renderEntry() {
+  if (!entryView) return;
+  if (!ENTRIES.length) {
+    entryView.innerHTML = '<em class="muted">目前還沒有日記</em>';
+    if (eTotal)  eTotal.textContent  = '0';
+    if (eCursor) eCursor.textContent = '0';
+    return;
+  }
+
+  const e = ENTRIES[idx];
+  if (eTotal)  eTotal.textContent  = String(ENTRIES.length);
+  if (eCursor) eCursor.textContent = String(idx + 1);
+  if (eJump)   eJump.value = String(idx + 1);
+
+  entryView.innerHTML = `
+    ${e.prompt_text ? `<div class="prompt-box">「${e.prompt_text}」</div>` : ''}
+    <div class="title">${e.title || '（無標題）'}</div>
+    <div class="meta">
+      ${e.date_label ? e.date_label + ' · ' : ''}${e.day_label ? e.day_label + ' · ' : ''}${e.author || ''} · ${e.mood || '🙂'}
+    </div>
+    <div class="text">${(e.text || '').replace(/</g,'&lt;')}</div>
+    ${e.image_url ? `<img class="thumb" src="${e.image_url}" alt="">` : ''}
+    <div style="margin-top:10px">
+      <button class="ghost danger" id="deleteEntryBtn">刪除這篇</button>
+    </div>
+  `;
+
+  // 綁刪除
+  const delBtn = document.getElementById('deleteEntryBtn');
+  if (delBtn) {
+    delBtn.onclick = async () => {
+      if (!confirm('確定要刪除這篇日記嗎？（圖片也會一併刪除）')) return;
+      await deleteEntryAndAssets(e.id, e.image_path, e.image_url);
+      // 從陣列移除並重畫
+      ENTRIES.splice(idx, 1);
+      if (idx >= ENTRIES.length) idx = Math.max(0, ENTRIES.length - 1);
+      renderEntry();
+    };
+  }
+}
+
+async function loadEntries() {
   const { data, error } = await supabase
     .from('entries')
     .select('*')
     .eq('diary_id', diary)
-    .order('date', { ascending:false })
-    .limit(10);
-  if (error){ console.error(error); return; }
+    .not('day_number', 'is', null)
+    .order('day_number', { ascending: true });
 
-  if (!recent) return;
-  recent.innerHTML = (data||[]).map(e => `
-    <div class="item"
-         data-id="${e.id}"
-         data-image-path="${e.image_path || ''}"
-         data-image-url="${e.image_url || ''}">
-      ${e.prompt_text ? `<div class="muted">「${e.prompt_text}」</div>` : ''}
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-        <strong>${e.title || '（無標題）'}</strong>
-        <button class="ghost danger" data-delete="${e.id}">刪除</button>
-      </div>
-      <div class="muted">
-        ${e.date_label ? e.date_label + ' · ' : ''}${e.day_label ? e.day_label + ' · ' : ''}${e.author || ''} · ${e.mood || '🙂'}
-      </div>
-      <div class="body">${e.text || ''}</div>
-      ${e.image_url ? `<img class="thumb" src="${e.image_url}">` : ''}
-    </div>
-  `).join('');
-
-  // 刪除事件（事件委派）
-  recent.onclick = async (ev)=>{
-    const btn = ev.target.closest('[data-delete]');
-    if (!btn) return;
-    const wrap = btn.closest('.item');
-    const id = wrap?.dataset.id;
-    const image_path = wrap?.dataset.imagePath || null;
-    const image_url  = wrap?.dataset.imageUrl  || null;
-
-    if (!id) return;
-    if (!confirm('確定要刪除這篇日記嗎？（圖片也會一併刪除）')) return;
-
-    await deleteEntryAndAssets(id, image_path, image_url);
-    await loadRecent();
-  };
+  if (error) {
+    console.error(error);
+    ENTRIES = [];
+  } else {
+    ENTRIES = data || [];
+  }
+  // 預設跳到最後一篇（最新）
+  idx = Math.max(0, ENTRIES.length - 1);
+  renderEntry();
 }
+
+// 瀏覽控制
+function wireEntryPager() {
+  if (ePrev) ePrev.onclick = () => { if (idx > 0) { idx--; renderEntry(); } };
+  if (eNext) eNext.onclick = () => { if (idx < ENTRIES.length - 1) { idx++; renderEntry(); } };
+  if (eJump) {
+    const go = () => {
+      const n = Math.trunc(Number(eJump.value) || 1);
+      if (!ENTRIES.length) return;
+      idx = Math.min(Math.max(n, 1), ENTRIES.length) - 1;
+      renderEntry();
+    };
+    eJump.addEventListener('change', go);
+    eJump.addEventListener('keyup', (e) => { if (e.key === 'Enter') go(); });
+  }
+}
+
 
 // ──────────────── 最新影片（讀取） ────────────────
 async function loadLatestVideo(){
@@ -246,7 +290,10 @@ function wireForm(){
     if (imageEl) imageEl.value = '';
     alert(`已儲存！本篇 Day ${payload.day_number}${payload.prompt_text ? '（已帶句子）' : '（無導引句）'}`);
 
-    loadRecent();
+    await loadEntries();          // 重新抓
+    idx = Math.max(0, ENTRIES.length - 1);  // 跳到最後一篇
+    renderEntry();
+
   });
 }
 
@@ -254,6 +301,10 @@ function wireForm(){
 async function init(){
   wireViewerNav();     // 先綁事件，按鈕立刻可用
   wireForm();
+
+  wireEntryPager();
+  await loadEntries();
+
 
   await loadPrompts();
   autoDay = await getNextDay(diary);
